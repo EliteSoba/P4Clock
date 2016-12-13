@@ -3,11 +3,13 @@ package com.soba.persona.p4clock;
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RemoteViews;
+import android.widget.TextClock;
 
 /**
  * Created by Tobias on 12/12/2016.

@@ -22,4 +22,18 @@
         android:id="@+id/analogClock"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/textView" />
+
+    <com.soba.persona.p4clock.CustomClock
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/myClock"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/analogClock"
+        android:layout_alignEnd="@+id/analogClock"
+        android:textSize="30dp"
+        android:layout_alignTop="@+id/analogClock"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="50dp"
+        android:text="12/13 Tu" />
+
 </RelativeLayout>

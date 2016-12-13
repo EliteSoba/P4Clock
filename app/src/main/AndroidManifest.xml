@@ -8,21 +8,23 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <!--activity android:name=".MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-->
         <activity android:name=".ClockChoice" android:theme="@android:style/Theme.Dialog">
         </activity>
         <receiver android:name=".ClockWidget" android:label="Custom Clock Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.soba.persona4.p4clock.ClockWidget.ACTION_WIDGET_RECEIVER" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/clock_widget" />
         </receiver>
+        <service android:enabled="true" android:name=".ClockWidget$UpdateService"/>
     </application>
 </manifest>
