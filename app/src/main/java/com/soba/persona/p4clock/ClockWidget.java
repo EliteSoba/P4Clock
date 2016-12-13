@@ -62,7 +62,8 @@ public class ClockWidget extends AppWidgetProvider{
             service = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
         }
 
-        m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), 60000, service);
+        context.startService(new Intent(context, UpdateService.class));
+        //m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), 60000, service);
     }
 
     public void onDisabled(Context context) {
@@ -81,18 +82,38 @@ public class ClockWidget extends AppWidgetProvider{
     public static final class UpdateService extends Service {
         static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
+        private final static IntentFilter sIntentFilter;
+        static {
+            sIntentFilter = new IntentFilter();
+            sIntentFilter.addAction(Intent.ACTION_TIME_TICK);
+            sIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+            sIntentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        }
         private Calendar mCalendar;
         @Override
         public void onCreate() {
             super.onCreate();
+
+            mCalendar = Calendar.getInstance();
+            registerReceiver(mTimeChangedReceiver, sIntentFilter);
         }
         @Override
         public IBinder onBind(Intent intent) {
             return null;
         }
 
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+            unregisterReceiver(mTimeChangedReceiver);
+        }
+
         public int onStartCommand(Intent intent, int flags, int startId) {
             update();
+
+            /*if (ACTION_UPDATE.equals(intent.getAction())) {
+                update();
+            }*/
 
             return super.onStartCommand(intent, flags, startId);
         }
@@ -116,7 +137,6 @@ public class ClockWidget extends AppWidgetProvider{
             return views;
         }
         private void update() {
-            mCalendar = Calendar.getInstance();
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             //final CharSequence time = DateFormat.format(mTimeFormat, mCalendar);
 
@@ -132,6 +152,19 @@ public class ClockWidget extends AppWidgetProvider{
             manager.updateAppWidget(widget, views);
 
         }
+        private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+
+                if (action.equals(Intent.ACTION_TIME_CHANGED) ||
+                        action.equals(Intent.ACTION_TIMEZONE_CHANGED))
+                {
+                }
+
+                update();
+            }
+        };
     }
 
 }
