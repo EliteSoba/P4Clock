@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">P4Clock</string>
+    <string name="hello">Hello World</string>
+    <string name="choice_intro">Pick:</string>
+</resources>
