@@ -33,7 +33,7 @@ public class ClockWidget extends AppWidgetProvider{
 
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        context.startService(new Intent(UpdateService.ACTION_UPDATE));
+        context.startService(new Intent(context, UpdateService.class));
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -82,6 +82,8 @@ public class ClockWidget extends AppWidgetProvider{
     public static final class UpdateService extends Service {
         static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
+        static Typeface clock = null, clock2 = null;
+
         private final static IntentFilter sIntentFilter;
         static {
             sIntentFilter = new IntentFilter();
@@ -118,20 +120,114 @@ public class ClockWidget extends AppWidgetProvider{
             return super.onStartCommand(intent, flags, startId);
         }
 
-        public static RemoteViews buildUpdate(Context context, String time)
+        public static RemoteViews buildTime(Context context, int hour) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
+            Bitmap myBitmap = Bitmap.createBitmap(350, 80, Bitmap.Config.ARGB_8888);
+            Canvas myCanvas = new Canvas(myBitmap);
+
+            if (clock2 == null) {
+                clock2 = Typeface.createFromAsset(context.getAssets(),"fonts/RobotoCondensed-Regular.ttf");
+            }
+
+            String time = "";
+            if (hour < 5) {
+                time = "Night";
+            }
+            else if (hour < 8) {
+                time = "Early Morning";
+            }
+            else if (hour < 12) {
+                time = "Morning";
+            }
+            else if (hour < 2) {
+                time = "Lunch";
+            }
+            else if (hour < 7) {
+                time = "Afternoon";
+            }
+            else if (hour < 10) {
+                time = "Evening";
+            }
+            else {
+                time = "Night";
+            }
+
+            Paint stroke = new Paint();
+            stroke.setAntiAlias(true);
+            stroke.setSubpixelText(true);
+            stroke.setTypeface(clock2);
+            stroke.setStyle(Paint.Style.STROKE);
+            stroke.setStrokeWidth(10);
+            stroke.setColor(Color.BLACK);
+            stroke.setTextSize(60);
+
+            int width = (int)stroke.measureText(time);
+
+
+            myCanvas.drawText(time, 325-width, 60, stroke);
+
+            Paint paint2 = new Paint();
+            paint2.setAntiAlias(true);
+            paint2.setSubpixelText(true);
+            paint2.setTypeface(clock2);
+            paint2.setStyle(Paint.Style.FILL);
+            paint2.setColor(Color.WHITE);
+            paint2.setTextSize(60);
+            myCanvas.drawText(time, 325-width, 60, paint2);
+
+            views.setImageViewBitmap(R.id.timeOfDay, myBitmap);
+
+            return views;
+        }
+
+        public static RemoteViews buildUpdate(Context context, String date, String day)
         {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
-            Bitmap myBitmap = Bitmap.createBitmap(300, 200, Bitmap.Config.ARGB_4444);
+            Bitmap myBitmap = Bitmap.createBitmap(235, 50, Bitmap.Config.ARGB_8888);
             Canvas myCanvas = new Canvas(myBitmap);
             Paint paint = new Paint();
-            Typeface clock = Typeface.createFromAsset(context.getAssets(),"fonts/Days.ttf");
+            if (clock == null) {
+                clock = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
+            }
             paint.setAntiAlias(true);
             paint.setSubpixelText(true);
             paint.setTypeface(clock);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.WHITE);
             paint.setTextSize(50);
-            myCanvas.drawText(time, 0, 50, paint);
+            myCanvas.drawText(date, 0, 50, paint);
+
+            if (clock2 == null) {
+                clock2 = Typeface.createFromAsset(context.getAssets(),"fonts/RobotoCondensed-Regular.ttf");
+            }
+
+            Paint paint3 = new Paint();
+            paint3.setAntiAlias(true);
+            paint3.setSubpixelText(true);
+            paint3.setTypeface(clock2);
+            paint3.setStyle(Paint.Style.STROKE);
+            paint3.setStrokeWidth(6);
+            paint3.setColor(Color.BLACK);
+            paint3.setTextSize(38);
+            myCanvas.drawText(day, 165, 47, paint3);
+
+            Paint paint2 = new Paint();
+            paint2.setAntiAlias(true);
+            paint2.setSubpixelText(true);
+            paint2.setTypeface(clock2);
+            paint2.setStyle(Paint.Style.FILL);
+            paint2.setColor(Color.WHITE);
+            //Special colors for weekends. Holidays should probably also be red, but that's much
+            //harder to set up and I'm not feeling it right now
+            if ("SAT".equals(day)) {
+                paint2.setColor(Color.rgb(165,194,218));
+            }
+            else if ("SUN".equals(day)) {
+                paint2.setColor(Color.rgb(215,157,167));
+            }
+            paint2.setTextSize(38);
+            myCanvas.drawText(day, 165, 47, paint2);
+
             views.setImageViewBitmap(R.id.maybeSomething, myBitmap);
 
             return views;
@@ -140,16 +236,18 @@ public class ClockWidget extends AppWidgetProvider{
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             //final CharSequence time = DateFormat.format(mTimeFormat, mCalendar);
 
-            String time = (String) DateFormat.format("h:mm", mCalendar);
-            RemoteViews views = buildUpdate(this, time);
+            String date = (String) DateFormat.format("MM/dd", mCalendar);
+            String day = (String) DateFormat.format("EEE", mCalendar);
+            RemoteViews views = buildUpdate(this, date, day.toUpperCase());
             /*RemoteViews views = new RemoteViews(getPackageName(), R.layout.clock_widget_layout);
             views.setTextViewText(R.id.Time, time);
             views.setTextViewText(R.id.Day, day);
             views.setTextViewText(R.id.Date, date);*/
-
+            RemoteViews views2 = buildTime(this, mCalendar.get(Calendar.HOUR_OF_DAY));
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
             manager.updateAppWidget(widget, views);
+            manager.updateAppWidget(widget, views2);
 
         }
         private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
