@@ -1,12 +1,7 @@
 # P4Clock
-An Android Clock Widget
+A Persona 4 themed Android Clock Widget. Does not actually tell time, but gives rough category of time of day (Morning, Afternoon, Evening, etc.)
 
-Uses https://code.tutsplus.com/tutorials/building-a-customizable-android-analog-clock-widget--mobile-11685 as a guide
+Uses https://code.tutsplus.com/tutorials/building-a-customizable-android-analog-clock-widget--mobile-11685 as a guide, among many other things
 
 ### Example
-Two instances running here. Left is 24 hr. Right is 12 hr.
-
-![Clocks in Action](http://i.imgur.com/QRjsoLG.png)
-
-Pressing the clock will prompt the choice between 12 hr and 24 hr
-![Options](http://i.imgur.com/Y0qiffV.png)
+![Clocks in Action](http://puu.sh/sOYCq/be8a509d62.jpg)
