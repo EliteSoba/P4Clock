@@ -2,4 +2,7 @@
     <string name="app_name">P4Clock</string>
     <string name="hello">Hello World</string>
     <string name="choice_intro">Pick:</string>
+    <string name="dayDateDesc">Field to show the current date and day</string>
+    <string name="timeDesc">Field to show the current time</string>
+    <string name="circleDesc">Image to hold the Persona 4 datetime circle</string>
 </resources>

@@ -8,6 +8,7 @@
     android:gravity="center">
 
     <ImageView
+        android:contentDescription="@string/circleDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
@@ -17,23 +18,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:scaleType="centerCrop"
-        android:paddingLeft="140dp"
+        android:paddingStart="150dp"
         android:nestedScrollingEnabled="false"
         android:layout_marginTop="-70dp"
-        android:layout_marginBottom="70dp" />
-
-    <!--TextClock
-        android:id="@+id/Clock0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        android:textSize="30sp"/>
-    <TextClock
-        android:id="@+id/Clock1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:textSize="30sp"/-->
+        android:layout_marginBottom="85dp" />
 
     <FrameLayout
         android:layout_width="wrap_content"
@@ -41,27 +29,28 @@
         android:background="@drawable/layout_bg"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:paddingStart="12dp"
-        android:layout_marginTop="20dp"
+        android:paddingStart="10dp"
+        android:layout_marginTop="15dp"
         android:paddingEnd="25dp"
         android:id="@+id/frameLayout">
 
         <ImageView
+            android:contentDescription="@string/dayDateDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/dayDate"
-            android:src="@android:drawable/button_onoff_indicator_on"
             android:layout_gravity="center"
             android:layout_marginTop="-3dp" />
     </FrameLayout>
 
     <ImageView
+        android:contentDescription="@string/timeDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timeOfDay"
         android:layout_below="@+id/frameLayout"
         android:layout_alignParentStart="true"
         android:layout_alignEnd="@id/frameLayout"
-        android:layout_marginTop="-8dp"
-        android:paddingRight="10dp" />
+        android:layout_marginTop="-11dp"
+        android:layout_marginEnd="10dp" />
 </RelativeLayout>
