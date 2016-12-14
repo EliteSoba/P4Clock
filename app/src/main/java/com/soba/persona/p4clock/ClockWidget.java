@@ -1,7 +1,5 @@
 package com.soba.persona.p4clock;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -26,7 +24,6 @@ import java.util.Calendar;
  */
 public class ClockWidget extends AppWidgetProvider{
     RemoteViews views;
-    private PendingIntent service = null;
     public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
 
     public void onEnabled(Context context) {
@@ -49,28 +46,13 @@ public class ClockWidget extends AppWidgetProvider{
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
-        //context.startService(new Intent(UpdateService.ACTION_UPDATE));
-
-        final AlarmManager m = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-
-        final Calendar TIME = Calendar.getInstance();
-        final Intent i = new Intent(context, UpdateService.class);
-
-        if (service == null) {
-            service = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-        }
 
         context.startService(new Intent(context, UpdateService.class));
-        //m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), 60000, service);
     }
 
     public void onDisabled(Context context) {
         super.onDisabled(context);
-        //context.stopService(new Intent(context, UpdateService.class));
-        final AlarmManager m = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        if (service != null) {
-            m.cancel(service);
-        }
+        context.stopService(new Intent(context, UpdateService.class));
     }
 
     public void onDeleted(Context context, int[] appWidgetIds) {
@@ -80,7 +62,8 @@ public class ClockWidget extends AppWidgetProvider{
     public static final class UpdateService extends Service {
         static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
-        static Typeface clock = null, clock2 = null;
+        Typeface clock = null, clock2 = null;
+        static int hour = -1;
 
         private final static IntentFilter sIntentFilter;
         static {
@@ -110,6 +93,7 @@ public class ClockWidget extends AppWidgetProvider{
 
         public int onStartCommand(Intent intent, int flags, int startId) {
             update();
+            hour = -1;
 
             /*if (ACTION_UPDATE.equals(intent.getAction())) {
                 update();
@@ -118,7 +102,7 @@ public class ClockWidget extends AppWidgetProvider{
             return super.onStartCommand(intent, flags, startId);
         }
 
-        public static RemoteViews buildTime(Context context, int hour) {
+        public RemoteViews buildTime(Context context, int hour) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
 
             if (hour == 0) {
@@ -149,7 +133,7 @@ public class ClockWidget extends AppWidgetProvider{
             return views;
         }
 
-        public static RemoteViews buildUpdate(Context context, String date, String day)
+        public RemoteViews buildUpdate(Context context, String date, String day)
         {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
             Bitmap myBitmap = Bitmap.createBitmap(275, 50, Bitmap.Config.ARGB_8888);
@@ -193,11 +177,16 @@ public class ClockWidget extends AppWidgetProvider{
         }
         private void update() {
             mCalendar.setTimeInMillis(System.currentTimeMillis());
+            int h = mCalendar.get(Calendar.HOUR_OF_DAY);
+            if (hour == h) {
+                return;
+            }
+            hour = h;
 
             String date = (String) DateFormat.format("MM/dd", mCalendar);
             String day = (String) DateFormat.format("EEE", mCalendar);
             RemoteViews views = buildUpdate(this, date, day.toUpperCase());
-            RemoteViews views2 = buildTime(this, mCalendar.get(Calendar.HOUR_OF_DAY));
+            RemoteViews views2 = buildTime(this, hour);
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
