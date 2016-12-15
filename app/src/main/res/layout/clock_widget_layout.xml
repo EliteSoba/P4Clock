@@ -29,7 +29,7 @@
         custom:layout_constraintLeft_toLeftOf="@+id/backgroundCircle"
         android:layout_alignBottom="@+id/backgroundCircle"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="30dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="50dp"
         android:layout_height="50dp" />
 
@@ -68,10 +68,10 @@
         custom:layout_constraintBottom_toTopOf="@+id/weatherIcon"
         custom:layout_constraintRight_toRightOf="@+id/weatherIcon"
         android:layout_alignEnd="@+id/weatherIcon"
-        android:scaleX=".67"
-        android:scaleY=".67"
+        android:scaleX=".55"
+        android:scaleY=".55"
         android:layout_below="@+id/frameLayout"
-        android:layout_marginTop="-7dp"
-        android:layout_marginEnd="-20dp" />
+        android:layout_marginTop="-9dp"
+        android:layout_marginEnd="-23dp" />
 
 </RelativeLayout>
