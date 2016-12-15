@@ -5,4 +5,6 @@
     <string name="dayDateDesc">Field to show the current date and day</string>
     <string name="timeDesc">Field to show the current time</string>
     <string name="circleDesc">Image to hold the Persona 4 datetime circle</string>
+    <string name="weatherDesc">Image to hold the current weather</string>
+    <string name="openweatherKey">bf627e917416838a0bb0fe682abd87fe</string>
 </resources>

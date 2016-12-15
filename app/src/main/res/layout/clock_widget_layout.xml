@@ -1,46 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/custom_clock_widget"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:gravity="center">
+    android:gravity="top|center_horizontal">
 
     <ImageView
         android:contentDescription="@string/circleDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:src="@drawable/persona_clock"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:scaleType="centerCrop"
-        android:paddingStart="150dp"
+        android:id="@+id/backgroundCircle"
         android:nestedScrollingEnabled="false"
-        android:layout_marginTop="-70dp"
-        android:layout_marginBottom="85dp" />
+        tools:layout_constraintRight_creator="1"
+        custom:layout_constraintRight_toRightOf="parent"
+        custom:layout_constraintTop_toTopOf="parent"
+        android:scaleType="matrix"
+        android:background="@drawable/persona_clock_cropped"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
+    <ImageView
+        android:id="@+id/weatherIcon"
+        android:src="@drawable/cloudy"
+        android:contentDescription="@string/weatherDesc"
+        custom:layout_constraintBottom_toBottomOf="@+id/backgroundCircle"
+        custom:layout_constraintLeft_toLeftOf="@+id/backgroundCircle"
+        android:layout_alignBottom="@+id/backgroundCircle"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:background="@drawable/layout_bg"
-        android:layout_alignParentStart="true"
+        android:id="@+id/frameLayout"
+        custom:layout_constraintBottom_toTopOf="@+id/timeOfDay"
+        custom:layout_constraintRight_toRightOf="@+id/timeOfDay"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:paddingStart="10dp"
-        android:layout_marginTop="15dp"
-        android:paddingEnd="25dp"
-        android:id="@+id/frameLayout">
+        android:layout_marginTop="5dp"
+        android:layout_alignEnd="@+id/weatherIcon"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="60dp"
+        android:layout_marginEnd="20dp">
 
         <ImageView
             android:contentDescription="@string/dayDateDesc"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/dayDate"
             android:layout_gravity="center"
-            android:layout_marginTop="-3dp" />
+            android:layout_marginTop="-3dp"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/button_onoff_indicator_off"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp" />
     </FrameLayout>
 
     <ImageView
@@ -48,9 +64,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timeOfDay"
+        android:src="@drawable/night"
+        custom:layout_constraintBottom_toTopOf="@+id/weatherIcon"
+        custom:layout_constraintRight_toRightOf="@+id/weatherIcon"
+        android:layout_alignEnd="@+id/weatherIcon"
+        android:scaleX=".67"
+        android:scaleY=".67"
         android:layout_below="@+id/frameLayout"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@id/frameLayout"
-        android:layout_marginTop="-11dp"
-        android:layout_marginEnd="10dp" />
+        android:layout_marginTop="-7dp"
+        android:layout_marginEnd="-20dp" />
+
 </RelativeLayout>

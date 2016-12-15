@@ -1,5 +1,7 @@
 package com.soba.persona.p4clock;
 
+import android.*;
+import android.Manifest;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -8,21 +10,31 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.widget.RemoteViews;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.Calendar;
 
 /**
  * Created by Tobias on 12/12/2016.
  */
-public class ClockWidget extends AppWidgetProvider{
+public class ClockWidget extends AppWidgetProvider {
     RemoteViews views;
     public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
 
@@ -59,11 +71,14 @@ public class ClockWidget extends AppWidgetProvider{
         super.onDeleted(context, appWidgetIds);
     }
 
-    public static final class UpdateService extends Service {
+    public static final class UpdateService extends Service implements  GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
         static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
         Typeface clock = null, clock2 = null;
         static int hour = -1;
+
+        static GoogleApiClient mGoogleApiClient;
+        double lat = -1, lon = -1;
 
         private final static IntentFilter sIntentFilter;
         static {
@@ -76,9 +91,14 @@ public class ClockWidget extends AppWidgetProvider{
         @Override
         public void onCreate() {
             super.onCreate();
-
+            hour = -1;
             mCalendar = Calendar.getInstance();
             registerReceiver(mTimeChangedReceiver, sIntentFilter);
+
+
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+            mGoogleApiClient.connect();
         }
         @Override
         public IBinder onBind(Intent intent) {
@@ -89,17 +109,42 @@ public class ClockWidget extends AppWidgetProvider{
         public void onDestroy() {
             super.onDestroy();
             unregisterReceiver(mTimeChangedReceiver);
+            mGoogleApiClient.disconnect();
         }
 
         public int onStartCommand(Intent intent, int flags, int startId) {
-            update();
             hour = -1;
+            update();
 
             /*if (ACTION_UPDATE.equals(intent.getAction())) {
                 update();
             }*/
 
             return super.onStartCommand(intent, flags, startId);
+        }
+
+        public RemoteViews buildWeather(Context context) {
+            String date = ":(";
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
+            Bitmap myBitmap = Bitmap.createBitmap(275, 50, Bitmap.Config.ARGB_8888);
+            Canvas myCanvas = new Canvas(myBitmap);
+            Paint paint = new Paint();
+            if (clock == null) {
+                clock = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
+            }
+
+            paint.setAntiAlias(true);
+            paint.setSubpixelText(true);
+            paint.setTypeface(clock);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            paint.setTextSize(50);
+            paint.setLetterSpacing(0.25f);
+            myCanvas.drawText(date, 0, 50, paint);
+
+            views.setImageViewBitmap(R.id.weatherIcon, myBitmap);
+
+            return views;
         }
 
         public RemoteViews buildTime(Context context, int hour) {
@@ -135,8 +180,9 @@ public class ClockWidget extends AppWidgetProvider{
 
         public RemoteViews buildUpdate(Context context, String date, String day)
         {
+
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
-            Bitmap myBitmap = Bitmap.createBitmap(275, 50, Bitmap.Config.ARGB_8888);
+            Bitmap myBitmap = Bitmap.createBitmap(360, 50, Bitmap.Config.ARGB_8888);
             Canvas myCanvas = new Canvas(myBitmap);
             Paint paint = new Paint();
             if (clock == null) {
@@ -169,13 +215,33 @@ public class ClockWidget extends AppWidgetProvider{
                 paint2.setColor(Color.rgb(215,157,167));
             }
             paint2.setTextSize(36);
-            myCanvas.drawText(day, 215, 43, paint2);
+            myCanvas.drawText(day, 230, 43, paint2);
 
             views.setImageViewBitmap(R.id.dayDate, myBitmap);
 
             return views;
         }
         private void update() {
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            }
+            else {
+                LocationManager man = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                long time_update = 30*60*1000;
+                long dist_update = 10;
+                man.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, time_update, dist_update, this);
+                Location mLastLocation = man.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if (mLastLocation == null) {
+
+                    lat = 1;
+                    lon = 2;
+                }
+                else {
+                    lat = mLastLocation.getLatitude();
+                    lon = mLastLocation.getLongitude();
+                }
+            }
+
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             int h = mCalendar.get(Calendar.HOUR_OF_DAY);
             if (hour == h) {
@@ -187,11 +253,13 @@ public class ClockWidget extends AppWidgetProvider{
             String day = (String) DateFormat.format("EEE", mCalendar);
             RemoteViews views = buildUpdate(this, date, day.toUpperCase());
             RemoteViews views2 = buildTime(this, hour);
+            //RemoteViews views3 = buildWeather(this);
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
             manager.updateAppWidget(widget, views);
             manager.updateAppWidget(widget, views2);
+            //manager.updateAppWidget(widget, views3);
 
         }
         private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
@@ -207,6 +275,41 @@ public class ClockWidget extends AppWidgetProvider{
                 update();
             }
         };
+
+        @Override
+        public void onConnected(Bundle bundle) {
+
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+
+        }
+
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
     }
 
 }
