@@ -22,57 +22,89 @@
         android:src="@drawable/persona_clock_cropped" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="20"
         android:layout_alignBottom="@+id/backgroundCircle"
         android:layout_alignEnd="@+id/backgroundCircle"
-        android:gravity="bottom|end"
-        android:layout_marginEnd="5dp">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:background="@drawable/layout_bg"
-            android:id="@+id/frameLayout"
-            custom:layout_constraintBottom_toTopOf="@+id/timeOfDay"
-            custom:layout_constraintRight_toRightOf="@+id/timeOfDay"
-            android:layout_height="0dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="60dp"
-            android:layout_marginEnd="40dp"
-            android:layout_weight="3">
-
-            <ImageView
-                android:contentDescription="@string/dayDateDesc"
-                android:id="@+id/dayDate"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:adjustViewBounds="true" />
-        </FrameLayout>
+        android:weightSum="10"
+        android:gravity="start">
 
         <ImageView
-            android:contentDescription="@string/timeDesc"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:id="@+id/timeOfDay"
-            android:src="@drawable/night"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="8"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:layout_marginEnd="-10dp" />
+            android:weightSum="21"
+            android:gravity="bottom|end"
+            android:layout_marginEnd="5dp">
 
-        <ImageView
-            android:id="@+id/weatherIcon"
-            android:src="@drawable/rain"
-            android:contentDescription="@string/weatherDesc"
-            android:layout_weight="9"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="4"
+                android:weightSum="10">
 
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:background="@drawable/layout_bg"
+                    android:id="@+id/frameLayout"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="8">
+
+                    <ImageView
+                        android:contentDescription="@string/dayDateDesc"
+                        android:id="@+id/dayDate"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:adjustViewBounds="true"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="8"
+                android:weightSum="10">
+
+                <ImageView
+                    android:contentDescription="@string/timeDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/timeOfDay"
+                    android:src="@drawable/night"
+                    android:layout_weight="8"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="9"
+                android:weightSum="10">
+                <ImageView
+                    android:id="@+id/weatherIcon"
+                    android:src="@drawable/rain"
+                    android:contentDescription="@string/weatherDesc"
+                    android:layout_weight="9"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:scaleType="fitEnd" /></LinearLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>
