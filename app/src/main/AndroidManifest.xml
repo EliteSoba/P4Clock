@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,9 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ClockChoice" android:theme="@android:style/Theme.Dialog">
-        </activity>
-        <receiver android:name=".ClockWidget" android:label="Custom Clock Widget">
+        
+        <receiver android:name=".ClockWidget" android:label="Persona 4 Clock Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.soba.persona4.p4clock.ClockWidget.ACTION_WIDGET_RECEIVER" />
