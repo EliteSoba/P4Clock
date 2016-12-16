@@ -19,16 +19,28 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 
 /**
@@ -74,11 +86,71 @@ public class ClockWidget extends AppWidgetProvider {
     public static final class UpdateService extends Service implements  GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
         static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
+        private class GetWeatherTask extends AsyncTask<URL, Integer, Integer> {
+
+            RemoteViews views;
+            Context context;
+
+            GetWeatherTask(RemoteViews views, Context context) {
+                this.views = views;
+                this.context = context;
+            }
+
+            @Override
+            protected Integer doInBackground(URL... params) {
+                URL url = params[0];
+                try {
+                    HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                    BufferedReader read = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = read.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    String output = result.toString();
+                    JSONObject jsonOut = new JSONObject(output);
+                    JSONArray weather = jsonOut.getJSONArray("weather");
+                    return weather.getJSONObject(0).getInt("id");
+
+                } catch (IOException e) { } catch (JSONException e) { }
+                return 0;
+            }
+
+            @Override
+            protected void onPostExecute(Integer result) {
+                int icon = R.drawable.unknown;
+                switch (result / 100) {
+                    case 2: icon = R.drawable.thunderstorms; break;
+                    case 3:
+                    case 5: icon = R.drawable.rain; break;
+                    case 6: icon = R.drawable.snow; break;
+                    case 7: icon = R.drawable.fog; break;
+                    case 8: icon = R.drawable.clear; break;
+                    default: icon = R.drawable.unknown;
+                }
+                if (result > 800) {
+                    icon = R.drawable.cloudy;
+                }
+                if (result >= 900) {
+                    icon = R.drawable.unknown;
+                }
+                views.setImageViewResource(R.id.weatherIcon, icon);
+
+                ComponentName widget = new ComponentName(context, ClockWidget.class);
+                AppWidgetManager manager = AppWidgetManager.getInstance(context);
+                manager.updateAppWidget(widget, views);
+
+            }
+        }
+
         Typeface clock = null, clock2 = null;
         static int hour = -1;
 
         static GoogleApiClient mGoogleApiClient;
-        double lat = -1, lon = -1;
+        int lat = -1, lon = -1;
+        boolean located = false;
 
         private final static IntentFilter sIntentFilter;
         static {
@@ -121,30 +193,6 @@ public class ClockWidget extends AppWidgetProvider {
             }*/
 
             return super.onStartCommand(intent, flags, startId);
-        }
-
-        public RemoteViews buildWeather(Context context) {
-            String date = ":(";
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
-            Bitmap myBitmap = Bitmap.createBitmap(275, 50, Bitmap.Config.ARGB_8888);
-            Canvas myCanvas = new Canvas(myBitmap);
-            Paint paint = new Paint();
-            if (clock == null) {
-                clock = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
-            }
-
-            paint.setAntiAlias(true);
-            paint.setSubpixelText(true);
-            paint.setTypeface(clock);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.WHITE);
-            paint.setTextSize(50);
-            paint.setLetterSpacing(0.25f);
-            myCanvas.drawText(date, 0, 50, paint);
-
-            views.setImageViewBitmap(R.id.weatherIcon, myBitmap);
-
-            return views;
         }
 
         public RemoteViews buildTime(Context context, int hour) {
@@ -222,6 +270,12 @@ public class ClockWidget extends AppWidgetProvider {
             return views;
         }
         private void update() {
+            mCalendar.setTimeInMillis(System.currentTimeMillis());
+            int h = mCalendar.get(Calendar.HOUR_OF_DAY);
+            if (hour == h) {
+                return;
+            }
+            hour = h;
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             }
@@ -232,34 +286,37 @@ public class ClockWidget extends AppWidgetProvider {
                 man.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, time_update, dist_update, this);
                 Location mLastLocation = man.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 if (mLastLocation == null) {
-
                     lat = 1;
                     lon = 2;
                 }
                 else {
-                    lat = mLastLocation.getLatitude();
-                    lon = mLastLocation.getLongitude();
+                    lat = (int)mLastLocation.getLatitude();
+                    lon = (int)mLastLocation.getLongitude();
+                    located = true;
                 }
             }
 
-            mCalendar.setTimeInMillis(System.currentTimeMillis());
-            int h = mCalendar.get(Calendar.HOUR_OF_DAY);
-            if (hour == h) {
-                return;
-            }
-            hour = h;
-
             String date = (String) DateFormat.format("MM/dd", mCalendar);
             String day = (String) DateFormat.format("EEE", mCalendar);
-            RemoteViews views = buildUpdate(this, date, day.toUpperCase());
-            RemoteViews views2 = buildTime(this, hour);
-            //RemoteViews views3 = buildWeather(this);
+            RemoteViews dateView = buildUpdate(this, date, day.toUpperCase());
+            RemoteViews timeView = buildTime(this, hour);
+
+            RemoteViews weatherView = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
+
+
+            /*if (located) {
+                try {
+                    String url = "http://api.openweathermap.org/data/2.5/weather?"
+                            + "lat=" + lat + "&lon=" + lon
+                            + "&APPID=" + R.string.openweatherKey;
+                    new GetWeatherTask(weatherView, this).execute(new URL(url));
+                } catch (MalformedURLException e) { }
+            }*/
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
-            manager.updateAppWidget(widget, views);
-            manager.updateAppWidget(widget, views2);
-            //manager.updateAppWidget(widget, views3);
+            manager.updateAppWidget(widget, dateView);
+            manager.updateAppWidget(widget, timeView);
 
         }
         private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
