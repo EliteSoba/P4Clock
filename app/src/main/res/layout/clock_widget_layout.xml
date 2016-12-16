@@ -25,56 +25,54 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:weightSum="4"
+        android:weightSum="20"
         android:layout_alignBottom="@+id/backgroundCircle"
         android:layout_alignEnd="@+id/backgroundCircle"
-        android:gravity="bottom|end">
+        android:gravity="bottom|end"
+        android:layout_marginEnd="5dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/layout_bg"
+            android:id="@+id/frameLayout"
+            custom:layout_constraintBottom_toTopOf="@+id/timeOfDay"
+            custom:layout_constraintRight_toRightOf="@+id/timeOfDay"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="40dp"
+            android:layout_weight="3">
+
+            <ImageView
+                android:contentDescription="@string/dayDateDesc"
+                android:layout_width="wrap_content"
+                android:id="@+id/dayDate"
+                android:layout_gravity="center"
+                android:layout_marginTop="-3dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp" />
+        </FrameLayout>
+
+        <ImageView
+            android:contentDescription="@string/timeDesc"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/timeOfDay"
+            android:src="@drawable/night"
+            android:layout_weight="8"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:layout_marginEnd="-10dp" />
 
         <ImageView
             android:id="@+id/weatherIcon"
             android:src="@drawable/unknown"
             android:contentDescription="@string/weatherDesc"
-            android:layout_weight="2"
+            android:layout_weight="9"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginEnd="25dp" />
+            android:layout_height="0dp" />
 
     </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:background="@drawable/layout_bg"
-        android:id="@+id/frameLayout"
-        custom:layout_constraintBottom_toTopOf="@+id/timeOfDay"
-        custom:layout_constraintRight_toRightOf="@+id/timeOfDay"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="5dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="60dp"
-        android:layout_marginEnd="20dp">
-
-        <ImageView
-            android:contentDescription="@string/dayDateDesc"
-            android:layout_width="wrap_content"
-            android:id="@+id/dayDate"
-            android:layout_gravity="center"
-            android:layout_marginTop="-3dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp" />
-    </FrameLayout>
-
-    <ImageView
-        android:contentDescription="@string/timeDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/timeOfDay"
-        android:src="@drawable/night"
-        android:scaleX=".6"
-        android:scaleY=".6"
-        android:layout_below="@+id/frameLayout"
-        android:layout_marginTop="-6dp"
-        android:layout_marginEnd="-23dp" />
 
 </RelativeLayout>

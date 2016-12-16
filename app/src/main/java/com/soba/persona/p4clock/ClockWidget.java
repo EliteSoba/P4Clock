@@ -304,14 +304,14 @@ public class ClockWidget extends AppWidgetProvider {
             RemoteViews weatherView = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
 
 
-            /*if (located) {
+            if (located) {
                 try {
                     String url = "http://api.openweathermap.org/data/2.5/weather?"
                             + "lat=" + lat + "&lon=" + lon
                             + "&APPID=" + R.string.openweatherKey;
                     new GetWeatherTask(weatherView, this).execute(new URL(url));
                 } catch (MalformedURLException e) { }
-            }*/
+            }
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
