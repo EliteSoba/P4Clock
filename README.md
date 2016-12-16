@@ -4,4 +4,4 @@ A Persona 4 themed Android Clock Widget. Does not actually tell time, but gives 
 Uses https://code.tutsplus.com/tutorials/building-a-customizable-android-analog-clock-widget--mobile-11685 as a guide, among many other things
 
 ### Example
-![Clocks in Action](http://puu.sh/sOYCq/be8a509d62.jpg)
+![Clocks in Action](http://puu.sh/sRfyz/e823b044c8.png)
