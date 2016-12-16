@@ -23,6 +23,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.MainThread;
 import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.widget.RemoteViews;
@@ -53,6 +54,12 @@ public class ClockWidget extends AppWidgetProvider {
 
     public void onEnabled(Context context) {
         super.onEnabled(context);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
         context.startService(new Intent(context, UpdateService.class));
     }
 
@@ -145,7 +152,7 @@ public class ClockWidget extends AppWidgetProvider {
 
         static GoogleApiClient mGoogleApiClient;
         int lat = -1, lon = -1;
-        boolean located = false;
+        boolean located = false, permissed = false;
 
         private final static IntentFilter sIntentFilter;
         static {
@@ -271,6 +278,12 @@ public class ClockWidget extends AppWidgetProvider {
             return views;
         }
         private void update() {
+            //On minute tick, if we now have permissions where we didn't before, force the update
+            if (!permissed && (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+                hour = -1;
+            }
+
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             int h = mCalendar.get(Calendar.HOUR_OF_DAY);
             if (hour == h) {
@@ -280,23 +293,27 @@ public class ClockWidget extends AppWidgetProvider {
 
             //IDK if this actually changes anything, but try to get location from network provider first, then gps
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     LocationManager man = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                     long time_update = 30*60*1000;
                     long dist_update = 10;
                     man.requestLocationUpdates(LocationManager.GPS_PROVIDER, time_update, dist_update, this);
                     Location mLastLocation = man.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                     if (mLastLocation == null) {
-                        lat = 1;
-                        lon = 2;
+                        /*lat = 1;
+                        lon = 2;*/
                     }
                     else {
                         lat = (int)mLastLocation.getLatitude();
                         lon = (int)mLastLocation.getLongitude();
                         located = true;
+                        permissed = true;
                     }
                 }
-                //No access to either :(
+                else {
+                    //No access to either :(
+                    permissed = false;
+                }
             }
             else {
                 LocationManager man = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -305,13 +322,14 @@ public class ClockWidget extends AppWidgetProvider {
                 man.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, time_update, dist_update, this);
                 Location mLastLocation = man.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 if (mLastLocation == null) {
-                    lat = 1;
-                    lon = 2;
+                    /*lat = 1;
+                    lon = 2;*/
                 }
                 else {
                     lat = (int)mLastLocation.getLatitude();
                     lon = (int)mLastLocation.getLongitude();
                     located = true;
+                    permissed = true;
                 }
             }
 
@@ -322,7 +340,7 @@ public class ClockWidget extends AppWidgetProvider {
 
             RemoteViews weatherView = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
 
-            located = false;
+            //located = false;
             if (located) {
                 try {
                     String url = "http://api.openweathermap.org/data/2.5/weather?"

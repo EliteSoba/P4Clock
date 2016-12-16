@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Persona 4 Clock Widget</string>
+    <string name="app_name">Persona 4 HUD Widget</string>
     <string name="hello">Hello</string>
     <string name="helloFollowup">This is currently a work in progress. For now, it should just ask you for location permissions</string>
     <string name="contact">For any concerns, please contact me at @Elite_Soba</string>

@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         
-        <receiver android:name=".ClockWidget" android:label="Persona 4 Clock Widget">
+        <receiver android:name=".ClockWidget" android:label="Persona 4 HUD Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.soba.persona4.p4clock.ClockWidget.ACTION_WIDGET_RECEIVER" />

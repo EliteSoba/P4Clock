@@ -96,7 +96,7 @@
                 android:weightSum="10">
                 <ImageView
                     android:id="@+id/weatherIcon"
-                    android:src="@drawable/rain"
+                    android:src="@drawable/unknown"
                     android:contentDescription="@string/weatherDesc"
                     android:layout_weight="9"
                     android:layout_width="0dp"
