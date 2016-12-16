@@ -4,4 +4,5 @@
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/clock_widget_layout"
     android:widgetCategory="home_screen"
+    android:previewImage="@drawable/sample"
     />
