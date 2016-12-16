@@ -57,6 +57,7 @@ public class ClockWidget extends AppWidgetProvider {
 
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+
         /*String action = intent.getAction();
         if (AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
             views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
@@ -114,7 +115,10 @@ public class ClockWidget extends AppWidgetProvider {
                     JSONArray weather = jsonOut.getJSONArray("weather");
                     return weather.getJSONObject(0).getInt("id");
 
-                } catch (IOException e) { } catch (JSONException e) { }
+                } catch (IOException e) {
+                    e.printStackTrace(); }
+                catch (JSONException e) {
+                    e.printStackTrace(); }
                 return 0;
             }
 
@@ -213,7 +217,7 @@ public class ClockWidget extends AppWidgetProvider {
             else if (hour < 14) {
                 views.setImageViewResource(R.id.timeOfDay, R.drawable.lunchtime);
             }
-            else if (hour < 19) {
+            else if (hour < 18) {
                 views.setImageViewResource(R.id.timeOfDay, R.drawable.afternoon);
             }
             else if (hour < 22) {
@@ -308,7 +312,8 @@ public class ClockWidget extends AppWidgetProvider {
                 try {
                     String url = "http://api.openweathermap.org/data/2.5/weather?"
                             + "lat=" + lat + "&lon=" + lon
-                            + "&APPID=" + R.string.openweatherKey;
+                            + "&APPID=" + getString(R.string.openweatherKey);
+
                     new GetWeatherTask(weatherView, this).execute(new URL(url));
                 } catch (MalformedURLException e) { }
             }
