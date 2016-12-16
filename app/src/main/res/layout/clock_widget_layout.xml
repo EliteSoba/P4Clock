@@ -45,13 +45,13 @@
 
             <ImageView
                 android:contentDescription="@string/dayDateDesc"
-                android:layout_width="wrap_content"
                 android:id="@+id/dayDate"
-                android:layout_gravity="center"
-                android:layout_marginTop="-3dp"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp" />
+                android:layout_marginEnd="10dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:adjustViewBounds="true" />
         </FrameLayout>
 
         <ImageView
@@ -67,7 +67,7 @@
 
         <ImageView
             android:id="@+id/weatherIcon"
-            android:src="@drawable/unknown"
+            android:src="@drawable/rain"
             android:contentDescription="@string/weatherDesc"
             android:layout_weight="9"
             android:layout_width="wrap_content"

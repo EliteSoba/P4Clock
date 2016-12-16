@@ -222,26 +222,21 @@ public class ClockWidget extends AppWidgetProvider {
 
         public RemoteViews buildUpdate(Context context, String date, String day)
         {
-
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
-            Bitmap myBitmap = Bitmap.createBitmap(360, 50, Bitmap.Config.ARGB_8888);
-            Canvas myCanvas = new Canvas(myBitmap);
-            Paint paint = new Paint();
             if (clock == null) {
                 clock = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
             }
+            if (clock2 == null) {
+                clock2 = Typeface.createFromAsset(context.getAssets(),"fonts/RobotoCondensed-Regular.ttf");
+            }
+
+            Paint paint = new Paint();
             paint.setAntiAlias(true);
             paint.setSubpixelText(true);
             paint.setTypeface(clock);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.WHITE);
-            paint.setTextSize(50);
-            paint.setLetterSpacing(0.25f);
-            myCanvas.drawText(date, 0, 50, paint);
+            paint.setTextSize(100);
 
-            if (clock2 == null) {
-                clock2 = Typeface.createFromAsset(context.getAssets(),"fonts/RobotoCondensed-Regular.ttf");
-            }
             Paint paint2 = new Paint();
             paint2.setAntiAlias(true);
             paint2.setSubpixelText(true);
@@ -256,8 +251,19 @@ public class ClockWidget extends AppWidgetProvider {
             else if ("SUN".equals(day)) {
                 paint2.setColor(Color.rgb(215,157,167));
             }
-            paint2.setTextSize(36);
-            myCanvas.drawText(day, 230, 43, paint2);
+            paint2.setTextSize(65);
+
+            int dateWidth = (int)paint.measureText(date);
+            int dayWidth = (int)paint2.measureText(day);
+
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
+            Bitmap myBitmap = Bitmap.createBitmap(dateWidth + 75 + dayWidth + 100,
+                    75, Bitmap.Config.ARGB_8888);
+            Canvas myCanvas = new Canvas(myBitmap);
+
+            //paint.setLetterSpacing(0.25f);
+            myCanvas.drawText(date, 0, 75, paint);
+            myCanvas.drawText(day, dateWidth + 75, 52, paint2);
 
             views.setImageViewBitmap(R.id.dayDate, myBitmap);
 
@@ -315,7 +321,7 @@ public class ClockWidget extends AppWidgetProvider {
 
             RemoteViews weatherView = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
 
-            //located = false;
+            located = false;
             if (located) {
                 try {
                     String url = "http://api.openweathermap.org/data/2.5/weather?"
@@ -328,6 +334,7 @@ public class ClockWidget extends AppWidgetProvider {
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
             AppWidgetManager manager = AppWidgetManager.getInstance(this);
+
             manager.updateAppWidget(widget, dateView);
             manager.updateAppWidget(widget, timeView);
 
