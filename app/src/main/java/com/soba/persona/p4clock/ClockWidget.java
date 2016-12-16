@@ -2,6 +2,7 @@ package com.soba.persona.p4clock;
 
 import android.*;
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -236,6 +237,7 @@ public class ClockWidget extends AppWidgetProvider {
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.WHITE);
             paint.setTextSize(100);
+            paint.setLetterSpacing(0.25f);
 
             Paint paint2 = new Paint();
             paint2.setAntiAlias(true);
@@ -261,7 +263,6 @@ public class ClockWidget extends AppWidgetProvider {
                     75, Bitmap.Config.ARGB_8888);
             Canvas myCanvas = new Canvas(myBitmap);
 
-            //paint.setLetterSpacing(0.25f);
             myCanvas.drawText(date, 0, 75, paint);
             myCanvas.drawText(day, dateWidth + 75, 52, paint2);
 
