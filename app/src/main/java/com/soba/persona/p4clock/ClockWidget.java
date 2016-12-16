@@ -57,16 +57,6 @@ public class ClockWidget extends AppWidgetProvider {
 
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-
-        /*String action = intent.getAction();
-        if (AppWidgetManager.ACTION_APPWIDGET_UPDATE.equals(action)) {
-            views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
-            //views = buildUpdate(context, time);
-            Intent choiceIntent = new Intent(context, ClockChoice.class);
-            PendingIntent clickPendIntent = PendingIntent.getActivity(context, 0, choiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.custom_clock_widget, clickPendIntent);
-            AppWidgetManager.getInstance(context).updateAppWidget(intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS), views);
-        }*/
     }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -281,7 +271,25 @@ public class ClockWidget extends AppWidgetProvider {
             }
             hour = h;
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //IDK if this actually changes anything, but try to get location from network provider first, then gps
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    LocationManager man = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                    long time_update = 30*60*1000;
+                    long dist_update = 10;
+                    man.requestLocationUpdates(LocationManager.GPS_PROVIDER, time_update, dist_update, this);
+                    Location mLastLocation = man.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (mLastLocation == null) {
+                        lat = 1;
+                        lon = 2;
+                    }
+                    else {
+                        lat = (int)mLastLocation.getLatitude();
+                        lon = (int)mLastLocation.getLongitude();
+                        located = true;
+                    }
+                }
+                //No access to either :(
             }
             else {
                 LocationManager man = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -307,7 +315,7 @@ public class ClockWidget extends AppWidgetProvider {
 
             RemoteViews weatherView = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
 
-
+            //located = false;
             if (located) {
                 try {
                     String url = "http://api.openweathermap.org/data/2.5/weather?"
