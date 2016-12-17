@@ -1,8 +1,6 @@
 package com.soba.persona.p4clock;
 
-import android.*;
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -23,11 +21,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.MainThread;
 import android.support.v4.app.ActivityCompat;
 import android.text.format.DateFormat;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -46,11 +42,10 @@ import java.net.URL;
 import java.util.Calendar;
 
 /**
+ * Logic controlling the Widget, including updates
  * Created by Tobias on 12/12/2016.
  */
 public class ClockWidget extends AppWidgetProvider {
-    RemoteViews views;
-    public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
 
     public void onEnabled(Context context) {
         super.onEnabled(context);
@@ -83,7 +78,6 @@ public class ClockWidget extends AppWidgetProvider {
     }
 
     public static final class UpdateService extends Service implements  GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
-        static final String ACTION_UPDATE = "com.soba.persona4.p4clock.action.UPDATE";
 
         private class GetWeatherTask extends AsyncTask<URL, Integer, Integer> {
 
@@ -113,16 +107,14 @@ public class ClockWidget extends AppWidgetProvider {
                     JSONArray weather = jsonOut.getJSONArray("weather");
                     return weather.getJSONObject(0).getInt("id");
 
-                } catch (IOException e) {
-                    e.printStackTrace(); }
-                catch (JSONException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace(); }
                 return 0;
             }
 
             @Override
             protected void onPostExecute(Integer result) {
-                int icon = R.drawable.unknown;
+                int icon;
                 switch (result / 100) {
                     case 2: icon = R.drawable.thunderstorms; break;
                     case 3:
@@ -189,10 +181,6 @@ public class ClockWidget extends AppWidgetProvider {
         public int onStartCommand(Intent intent, int flags, int startId) {
             hour = -1;
             update();
-
-            /*if (ACTION_UPDATE.equals(intent.getAction())) {
-                update();
-            }*/
 
             return super.onStartCommand(intent, flags, startId);
         }
@@ -299,11 +287,7 @@ public class ClockWidget extends AppWidgetProvider {
                     long dist_update = 10;
                     man.requestLocationUpdates(LocationManager.GPS_PROVIDER, time_update, dist_update, this);
                     Location mLastLocation = man.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if (mLastLocation == null) {
-                        /*lat = 1;
-                        lon = 2;*/
-                    }
-                    else {
+                    if (mLastLocation != null) {
                         lat = (int)mLastLocation.getLatitude();
                         lon = (int)mLastLocation.getLongitude();
                         located = true;
@@ -321,11 +305,7 @@ public class ClockWidget extends AppWidgetProvider {
                 long dist_update = 10;
                 man.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, time_update, dist_update, this);
                 Location mLastLocation = man.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                if (mLastLocation == null) {
-                    /*lat = 1;
-                    lon = 2;*/
-                }
-                else {
+                if (mLastLocation != null) {
                     lat = (int)mLastLocation.getLatitude();
                     lon = (int)mLastLocation.getLongitude();
                     located = true;
@@ -348,7 +328,7 @@ public class ClockWidget extends AppWidgetProvider {
                             + "&APPID=" + getString(R.string.openweatherKey);
 
                     new GetWeatherTask(weatherView, this).execute(new URL(url));
-                } catch (MalformedURLException e) { }
+                } catch (MalformedURLException e) { e.printStackTrace(); }
             }
 
             ComponentName widget = new ComponentName(this, ClockWidget.class);
@@ -361,13 +341,6 @@ public class ClockWidget extends AppWidgetProvider {
         private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final String action = intent.getAction();
-
-                if (action.equals(Intent.ACTION_TIME_CHANGED) ||
-                        action.equals(Intent.ACTION_TIMEZONE_CHANGED))
-                {
-                }
-
                 update();
             }
         };
