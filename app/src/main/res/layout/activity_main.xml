@@ -5,40 +5,127 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.soba.persona.p4clock.MainActivity"
-    android:background="@android:color/background_dark">
+    android:theme="@android:style/Theme.Holo"
+    android:background="#000000"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
+
 
     <ScrollView
-        android:layout_height="0dp"
-        android:layout_width="344dp">
+        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/scrollView2">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/hello"
-                android:id="@+id/textView"
-                android:textSize="30sp"
-                android:textAlignment="center" />
+                android:checkedButton="@+id/chooseButton"
+                android:id="@+id/radioGroup">
 
-            <TextView
-                android:text="@string/helloFollowup"
+                <TextView
+                    android:text="@string/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView4"
+                    android:layout_weight="1"
+                    android:textSize="24sp"
+                    android:layout_margin="5dp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <RadioButton
+                    android:layout_height="wrap_content"
+                    android:id="@+id/chooseButton"
+                    android:checked="true"
+                    android:text="@string/choose_location"
+                    android:layout_width="wrap_content"
+                    android:onClick="setLocation"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="2">
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:id="@+id/latText"
+                        android:layout_weight="1"
+                        android:hint="@string/latitude"
+                        android:inputType="numberSigned"
+                        android:selectAllOnFocus="true" />
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberSigned"
+                        android:ems="10"
+                        android:id="@+id/lonText"
+                        android:hint="@string/longitude"
+                        android:layout_weight="1"
+                        android:selectAllOnFocus="true" />
+                </LinearLayout>
+
+                <RadioButton
+                    android:text="@string/use_current_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/curLocationButton"
+                    android:layout_weight="1"
+                    android:onClick="useLocation" />
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?android:attr/listDivider"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp" />
+
+            <CheckBox
+                android:text="@string/disable_weather_updates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView2"
-                tools:text="@string/helloFollowup"
-                android:textSize="20sp"
-                android:textAlignment="center" />
+                android:id="@+id/disableBox"
+                android:onClick="disableWeather"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?android:attr/listDivider"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp" />
+
+            <Button
+                android:text="@string/force_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/updateButton"
+                android:elevation="1dp"
+                android:drawableStart="@android:drawable/ic_popup_sync"
+                android:onClick="updateButton" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?android:attr/listDivider"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp" />
 
             <TextView
                 android:text="@string/contact"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView3"
+                android:id="@+id/helpText"
                 android:textAlignment="center"
                 android:layout_marginTop="5dp" />
 

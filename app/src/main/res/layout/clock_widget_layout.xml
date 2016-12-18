@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/custom_clock_widget"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -12,7 +10,8 @@
         android:layout_height="fill_parent"
         android:src="@drawable/aspectratio"
         android:id="@+id/imageView2"
-        android:adjustViewBounds="true"/>
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/filler_desc" />
     <ImageView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -20,7 +19,8 @@
         android:layout_alignStart="@+id/imageView2"
         android:src="@drawable/aspectratio"
         android:id="@+id/imageView"
-        android:adjustViewBounds="true" />
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/filler_desc" />
 
     <ImageView
         android:contentDescription="@string/circleDesc"
@@ -43,16 +43,17 @@
         android:layout_alignEnd="@+id/imageView"
         android:layout_alignStart="@+id/imageView"
         android:layout_alignTop="@+id/imageView"
-        android:weightSum="10"
-        android:gravity="end">
+        android:weightSum="20"
+        android:gravity="end"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/linearLayout"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="9"
             android:weightSum="21"
+            android:layout_weight="19"
             android:gravity="bottom|end"
             android:layout_marginEnd="5dp">
 
@@ -61,7 +62,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="4"
-                android:weightSum="10">
+                android:weightSum="10"
+                android:baselineAligned="false">
 
                 <FrameLayout
                     android:layout_width="0dp"

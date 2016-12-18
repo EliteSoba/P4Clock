@@ -28,7 +28,7 @@ import java.util.Calendar;
  * Actually update the views. Abstracted to allow anyone to update on demand instead of just the UpdateService
  */
 
-public class WidgetUpdater {
+class WidgetUpdater {
 
     private static class GetWeatherTask extends AsyncTask<URL, Integer, Integer> {
 
@@ -90,10 +90,10 @@ public class WidgetUpdater {
         }
     }
 
-    static Typeface daydate = null, time = null;
-    static Calendar mCalendar = null;
+    private static Typeface daydate = null, time = null;
+    private static Calendar mCalendar = null;
 
-    public static RemoteViews buildTime(Context context, int hour) {
+    private static RemoteViews buildTime(Context context, int hour) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
 
         if (hour == 0) {
@@ -124,7 +124,7 @@ public class WidgetUpdater {
         return views;
     }
 
-    public static RemoteViews buildDayDate(Context context, String date, String day)
+    private static RemoteViews buildDayDate(Context context, String date, String day)
     {
         if (daydate == null) {
             daydate = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
@@ -174,7 +174,7 @@ public class WidgetUpdater {
         return views;
     }
 
-    public static void update(Context context) {
+    static void update(Context context) {
         if (mCalendar == null) {
             mCalendar = Calendar.getInstance();
         }
@@ -191,7 +191,7 @@ public class WidgetUpdater {
         manager.updateAppWidget(widget, timeView);
     }
 
-    public static void updateWeather(Context context, int lat, int lon) {
+    static void updateWeather(Context context, int lat, int lon) {
         RemoteViews weatherView = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
         try {
             String url = "http://api.openweathermap.org/data/2.5/weather?"

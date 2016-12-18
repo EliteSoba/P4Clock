@@ -8,4 +8,12 @@
     <string name="circleDesc">Image to hold the Persona 4 datetime circle</string>
     <string name="weatherDesc">Image to hold the current weather</string>
     <string name="openweatherKey">bf627e917416838a0bb0fe682abd87fe</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="use_current_location">Use Current Location</string>
+    <string name="choose_location">Choose Location</string>
+    <string name="location">Location</string>
+    <string name="disable_weather_updates">Disable Weather Updates</string>
+    <string name="force_update">Force Update</string>
+    <string name="filler_desc">Filler box to force aspect ratio</string>
 </resources>
