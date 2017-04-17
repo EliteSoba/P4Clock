@@ -6,4 +6,5 @@
     android:widgetCategory="home_screen"
     android:resizeMode="horizontal|vertical"
     android:previewImage="@drawable/sample"
+    android:configure="com.soba.persona.p4clock.ConfigurationActivity"
     />

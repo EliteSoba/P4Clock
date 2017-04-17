@@ -3,6 +3,7 @@
     <string name="hello">Hello</string>
     <string name="helloFollowup">This is currently a work in progress. For now, it should just ask you for location permissions</string>
     <string name="contact">For any concerns, please contact me at @Elite_Soba</string>
+    <string name="add">You cannot add this widget from this screen. You must add it via the home screen. Exact instructions vary.</string>
     <string name="dayDateDesc">Field to show the current date and day</string>
     <string name="timeDesc">Field to show the current time</string>
     <string name="circleDesc">Image to hold the Persona 4 datetime circle</string>
@@ -16,4 +17,5 @@
     <string name="disable_weather_updates">Disable Weather Updates</string>
     <string name="force_update">Force Update</string>
     <string name="filler_desc">Filler box to force aspect ratio</string>
+    <string name="confirm">Confirm</string>
 </resources>

@@ -120,6 +120,13 @@
                 android:background="?android:attr/listDivider"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="2dp" />
+            <TextView
+                android:text="@string/add"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/infoText"
+                android:textAlignment="center"
+                android:layout_marginTop="5dp" />
 
             <TextView
                 android:text="@string/contact"

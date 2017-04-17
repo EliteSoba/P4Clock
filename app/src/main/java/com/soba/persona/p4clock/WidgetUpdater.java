@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.Calendar;
 
 /**
- * Actually update the views. Abstracted to allow anyone to update on demand instead of just the UpdateService
+ * Actually updateTime the views. Abstracted to allow anyone to updateTime on demand instead of just the UpdateService
  */
 
 class WidgetUpdater {
@@ -174,7 +174,7 @@ class WidgetUpdater {
         return views;
     }
 
-    static void update(Context context) {
+    static void updateTime(Context context) {
         if (mCalendar == null) {
             mCalendar = Calendar.getInstance();
         }

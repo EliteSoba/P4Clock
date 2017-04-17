@@ -40,37 +40,38 @@ public class ClockWidget extends AppWidgetProvider {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }*/
-        Intent intent = new Intent(context, MainActivity.class);
+
+        /*Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-        context.startService(new Intent(context, UpdateService.class));
+        context.startActivity(intent);*/
+        //context.startService(new Intent(context, UpdateService.class));
     }
 
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
 
-        Intent i = new Intent(context, UpdateService.class);
+        if (intent.getAction() == MainActivity.update) {
+            Intent i = new Intent(context, UpdateService.class);
 
-        if (intent.getBooleanExtra(MainActivity.force, false)) {
-            i.putExtra(MainActivity.force, true);
+            if (intent.getBooleanExtra(MainActivity.force, false)) {
+                i.putExtra(MainActivity.force, true);
+            }
+
+            context.startService(i);
         }
-
-        context.startService(i);
 
     }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
+        /*RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
         Intent configIntent = new Intent(context, MainActivity.class);
         PendingIntent clickPendIntent = PendingIntent.getActivity(context, 0, configIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.custom_clock_widget, clickPendIntent);
-        appWidgetManager.updateAppWidget(appWidgetIds, views);
-
+        appWidgetManager.updateAppWidget(appWidgetIds, views);*/
         Intent i = new Intent(context, UpdateService.class);
         i.putExtra(MainActivity.force, true);
-
         context.startService(i);
     }
 
@@ -107,11 +108,13 @@ public class ClockWidget extends AppWidgetProvider {
             super.onCreate();
             hour = -1;
             mCalendar = Calendar.getInstance();
+            WidgetUpdater.updateTime(this);
             registerReceiver(mTimeChangedReceiver, sIntentFilter);
 
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
             mGoogleApiClient.connect();
+
         }
         @Override
         public IBinder onBind(Intent intent) {
@@ -148,6 +151,7 @@ public class ClockWidget extends AppWidgetProvider {
             }
 
             if (extras != null && extras.getBoolean(MainActivity.force, false)) {
+                WidgetUpdater.updateTime(this);
                 update();
             }
             else {
@@ -158,7 +162,7 @@ public class ClockWidget extends AppWidgetProvider {
         }
 
         private void update() {
-            WidgetUpdater.update(this);
+            //WidgetUpdater.updateTime(this);
 
             //If weather updates are disabled
             if (disabled) {
@@ -204,6 +208,7 @@ public class ClockWidget extends AppWidgetProvider {
         private void checkUpdate() {
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             int h = mCalendar.get(Calendar.HOUR_OF_DAY);
+            WidgetUpdater.updateTime(this);
             if (hour == h) {
                 return;
             }

@@ -14,11 +14,16 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import org.w3c.dom.Text;
+
+public class ConfigurationActivity extends AppCompatActivity {
 
     AppWidgetManager manager;
     SharedPreferences prefs;
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String lat = "com.soba.persona.p4clock.lat";
     public static final String lon = "com.soba.persona.p4clock.lon";
     public static final String force = "com.soba.persona.p4clock.force";
-    public static final String update = "com.soba.persona.p4clock.APPWIDGET_UPDATE";
+    int id;
 
     public void initEditTexts() {
         EditText latitude = (EditText)findViewById(R.id.latText);
@@ -104,9 +109,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            id = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        }
+        setResult(RESULT_CANCELED);
+
         setContentView(R.layout.activity_main);
         manager = AppWidgetManager.getInstance(this);
         prefs = getSharedPreferences(comName, MODE_PRIVATE);
+
+        Button start = (Button) findViewById(R.id.updateButton);
+        start.setText(R.string.confirm);
+        start.setCompoundDrawables(null, null, null, null);
+
+        TextView textView = (TextView)findViewById(R.id.infoText);
+        textView.setVisibility(View.GONE);
 
         initEditTexts();
         initRadios();
@@ -117,6 +136,9 @@ public class MainActivity extends AppCompatActivity {
             disableBox.callOnClick();
         }
 
+        AppWidgetManager awm = AppWidgetManager.getInstance(this);
+        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
+        awm.updateAppWidget(id, views);
     }
 
     public void updateWidget(boolean force) {
@@ -124,6 +146,10 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction(MainActivity.update);
         intent.putExtra(MainActivity.force, force);
         sendBroadcast(intent);
+
+        AppWidgetManager awm = AppWidgetManager.getInstance(this);
+        RemoteViews views = new RemoteViews(this.getPackageName(), R.layout.clock_widget_layout);
+        awm.updateAppWidget(id, views);
     }
 
     public void removeKey(String key) {
@@ -172,6 +198,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateButton(View view) {
         updateWidget(true);
+
+        Intent result = new Intent();
+        result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id);
+        setResult(RESULT_OK, result);
+        finish();
     }
 
     @Override
