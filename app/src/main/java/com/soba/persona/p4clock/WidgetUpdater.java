@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import org.json.JSONArray;
@@ -28,7 +29,7 @@ import java.util.Calendar;
  * Actually updateTime the views. Abstracted to allow anyone to updateTime on demand instead of just the UpdateService
  */
 
-class WidgetUpdater {
+public class WidgetUpdater {
 
     private static class GetWeatherTask extends AsyncTask<URL, Integer, Integer> {
 
@@ -90,10 +91,26 @@ class WidgetUpdater {
         }
     }
 
-    private static Typeface daydate = null, time = null;
-    private static Calendar mCalendar = null;
+    private Typeface daydate = null, time = null;
+    private Calendar mCalendar;
+    private int curHour, curDay;
+    private static final String TAG = "WidgetUpdater";
 
-    private static RemoteViews buildTime(Context context, int hour) {
+    public WidgetUpdater() {
+        mCalendar = Calendar.getInstance();
+        curHour = -1;
+        curDay = -1;
+    }
+
+    public int getCurHour() {
+        return curHour;
+    }
+
+    public int getCurDay() {
+        return curDay;
+    }
+
+    private RemoteViews buildTime(Context context, int hour) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
 
         if (hour == 0) {
@@ -120,11 +137,13 @@ class WidgetUpdater {
         else {
             views.setImageViewResource(R.id.timeOfDay, R.drawable.night);
         }
+        curHour = hour;
+        Log.v(TAG, "curHour set to " + hour);
 
         return views;
     }
 
-    private static RemoteViews buildDayDate(Context context, String date, String day)
+    private RemoteViews buildDayDate(Context context, String date, String day)
     {
         if (daydate == null) {
             daydate = Typeface.createFromAsset(context.getAssets(), "fonts/Days.ttf");
@@ -174,24 +193,22 @@ class WidgetUpdater {
         return views;
     }
 
-    static void updateTime(Context context) {
-        if (mCalendar == null) {
-            mCalendar = Calendar.getInstance();
-        }
-
+    public void updateTime(Context context, int hour) {
+        mCalendar.setTimeInMillis(System.currentTimeMillis());
         String date = (String) DateFormat.format("MM/dd", mCalendar);
         String day = (String) DateFormat.format("EEE", mCalendar);
+        curDay = mCalendar.get(Calendar.DATE);
         RemoteViews dateView = buildDayDate(context, date, day.toUpperCase());
-        RemoteViews timeView = buildTime(context, mCalendar.get(Calendar.HOUR_OF_DAY));
+        RemoteViews timeView = buildTime(context, hour);
 
-        ComponentName widget = new ComponentName(context, ClockWidget.class);
+        ComponentName widget = new ComponentName(context, ClockWidget.class.getName());
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
 
         manager.updateAppWidget(widget, dateView);
         manager.updateAppWidget(widget, timeView);
     }
 
-    static void updateWeather(Context context, int lat, int lon) {
+    public void updateWeather(Context context, int lat, int lon) {
         RemoteViews weatherView = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
         try {
             String url = "http://api.openweathermap.org/data/2.5/weather?"

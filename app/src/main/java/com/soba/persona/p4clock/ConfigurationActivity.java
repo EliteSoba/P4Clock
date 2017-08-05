@@ -21,8 +21,6 @@ import android.widget.RadioButton;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 public class ConfigurationActivity extends AppCompatActivity {
 
     AppWidgetManager manager;

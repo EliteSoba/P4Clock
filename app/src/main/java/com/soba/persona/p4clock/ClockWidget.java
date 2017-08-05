@@ -1,7 +1,6 @@
 package com.soba.persona.p4clock;
 
 import android.Manifest;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -18,13 +17,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.widget.RemoteViews;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.Calendar;
+import java.util.Random;
 
 /**
  * Logic controlling the Widget, including updates
@@ -48,8 +49,10 @@ public class ClockWidget extends AppWidgetProvider {
     }
 
     public void onReceive(Context context, Intent intent) {
+        //Called whenever settings get changed
+        //Essentially, the controls call this to update the Service settings
         super.onReceive(context, intent);
-
+        Log.v("Widget", intent.getAction());
         if (intent.getAction() == MainActivity.update) {
             Intent i = new Intent(context, UpdateService.class);
 
@@ -63,6 +66,7 @@ public class ClockWidget extends AppWidgetProvider {
     }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        //Only called on the creation of the widget
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
         /*RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget_layout);
@@ -86,7 +90,7 @@ public class ClockWidget extends AppWidgetProvider {
 
     public static final class UpdateService extends Service implements  GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, LocationListener {
 
-        static int hour = -1;
+        static int hour = -1, minute = 0;
 
         static GoogleApiClient mGoogleApiClient;
         int lat = -1, lon = -1;
@@ -94,6 +98,8 @@ public class ClockWidget extends AppWidgetProvider {
         boolean setLocation = false;
         boolean disabled = false;
         SharedPreferences prefs = null;
+        WidgetUpdater updater = null;
+        private static final String TAG = "UpdateService";
 
         private final static IntentFilter sIntentFilter;
         static {
@@ -101,14 +107,23 @@ public class ClockWidget extends AppWidgetProvider {
             sIntentFilter.addAction(Intent.ACTION_TIME_TICK);
             sIntentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             sIntentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+            sIntentFilter.addAction(Intent.ACTION_USER_PRESENT);
         }
         private Calendar mCalendar;
         @Override
         public void onCreate() {
+            //Called on the first creation of this service
             super.onCreate();
             hour = -1;
+            if (updater == null) {
+                updater = new WidgetUpdater();
+            }
+
+            minute = new Random().nextInt(60);
             mCalendar = Calendar.getInstance();
-            WidgetUpdater.updateTime(this);
+            mCalendar.setTimeInMillis(System.currentTimeMillis());
+            int h = mCalendar.get(Calendar.HOUR_OF_DAY);
+            updateTime(h);
             registerReceiver(mTimeChangedReceiver, sIntentFilter);
 
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
@@ -129,7 +144,7 @@ public class ClockWidget extends AppWidgetProvider {
         }
 
         public int onStartCommand(Intent intent, int flags, int startId) {
-            //hour = -1;
+            //Called multiple times. Essentially once per update of configuration settings
             if (prefs == null) {
                 prefs = getSharedPreferences(MainActivity.comName, MODE_PRIVATE);
             }
@@ -151,25 +166,31 @@ public class ClockWidget extends AppWidgetProvider {
             }
 
             if (extras != null && extras.getBoolean(MainActivity.force, false)) {
-                WidgetUpdater.updateTime(this);
-                update();
+                mCalendar.setTimeInMillis(System.currentTimeMillis());
+                int h = mCalendar.get(Calendar.HOUR_OF_DAY);
+                updateTime(h);
+                updateWeather();
             }
             else {
                 checkUpdate();
             }
-
-            return super.onStartCommand(intent, flags, startId);
+            return START_STICKY;
+            //return super.onStartCommand(intent, flags, startId);
         }
 
-        private void update() {
-            //WidgetUpdater.updateTime(this);
+        private void updateTime(int hour) {
+            updater.updateTime(this.getApplicationContext(), hour);
+        }
 
+        private void updateWeather() {
             //If weather updates are disabled
             if (disabled) {
                 return;
             }
 
+            Log.v(TAG, "Updating Weather");
             if (!setLocation) {
+                Log.v(TAG, "Getting Location");
                 //IDK if this actually changes anything, but try to get location from network provider first, then gps
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -201,24 +222,35 @@ public class ClockWidget extends AppWidgetProvider {
             }
 
             if (located) {
-                WidgetUpdater.updateWeather(this, lat, lon);
+                Log.v(TAG, "Location found. Calling Updater");
+                updater.updateWeather(this.getApplicationContext(), lat, lon);
             }
         }
 
         private void checkUpdate() {
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             int h = mCalendar.get(Calendar.HOUR_OF_DAY);
-            WidgetUpdater.updateTime(this);
-            if (hour == h) {
-                return;
+            int m = mCalendar.get(Calendar.MINUTE);
+            int d = mCalendar.get(Calendar.DATE);
+            //Toast.makeText(this, h + " " + d + " | " + updater.getCurHour() + " " + updater.getCurDay(), Toast.LENGTH_LONG).show();
+            Log.v(TAG, "Time Status: " + h + " " + d + " | " + updater.getCurHour() + " " + updater.getCurDay());
+            //Only update clock when my hour is different from the updater's hour
+            if (h != updater.getCurHour() || d != updater.getCurDay()) {
+                Log.v(TAG, "Updating Time");
+                updateTime(h);
             }
-            hour = h;
-            update();
+
+            //Only update the weather when hour is different and we hit the correct minute offset
+            if (hour != h && m >= minute) {
+                updateWeather();
+                hour = h;
+            }
 
         }
         private final BroadcastReceiver mTimeChangedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.v(TAG, "Received Intent. Checking for updates");
                 checkUpdate();
             }
         };

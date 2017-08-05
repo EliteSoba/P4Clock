@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Persona 4 HUD Widget</string>
+    <string name="app_name">P4 HUD Widget</string>
     <string name="hello">Hello</string>
     <string name="helloFollowup">This is currently a work in progress. For now, it should just ask you for location permissions</string>
     <string name="contact">For any concerns, please contact me at @Elite_Soba</string>
@@ -8,7 +8,7 @@
     <string name="timeDesc">Field to show the current time</string>
     <string name="circleDesc">Image to hold the Persona 4 datetime circle</string>
     <string name="weatherDesc">Image to hold the current weather</string>
-    <string name="openweatherKey">bf627e917416838a0bb0fe682abd87fe</string>
+    <string name="openweatherKey">c51fc6f823b14c1a7c08caf10f7ef4b1</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="use_current_location">Use Current Location</string>
