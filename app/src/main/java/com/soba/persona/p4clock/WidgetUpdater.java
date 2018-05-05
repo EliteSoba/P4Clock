@@ -193,18 +193,27 @@ public class WidgetUpdater {
         return views;
     }
 
-    public void updateTime(Context context, int hour) {
+    public void updateDate(Context context) {
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         String date = (String) DateFormat.format("MM/dd", mCalendar);
         String day = (String) DateFormat.format("EEE", mCalendar);
         curDay = mCalendar.get(Calendar.DATE);
+        Log.v(TAG, "Current day set to " + curDay);
         RemoteViews dateView = buildDayDate(context, date, day.toUpperCase());
-        RemoteViews timeView = buildTime(context, hour);
 
         ComponentName widget = new ComponentName(context, ClockWidget.class.getName());
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
 
         manager.updateAppWidget(widget, dateView);
+
+    }
+
+    public void updateTime(Context context, int hour) {
+        RemoteViews timeView = buildTime(context, hour);
+
+        ComponentName widget = new ComponentName(context, ClockWidget.class.getName());
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+
         manager.updateAppWidget(widget, timeView);
     }
 

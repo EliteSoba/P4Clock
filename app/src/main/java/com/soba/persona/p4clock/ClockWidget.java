@@ -124,6 +124,7 @@ public class ClockWidget extends AppWidgetProvider {
             mCalendar.setTimeInMillis(System.currentTimeMillis());
             int h = mCalendar.get(Calendar.HOUR_OF_DAY);
             updateTime(h);
+            updateDate();
             registerReceiver(mTimeChangedReceiver, sIntentFilter);
 
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
@@ -169,6 +170,7 @@ public class ClockWidget extends AppWidgetProvider {
                 mCalendar.setTimeInMillis(System.currentTimeMillis());
                 int h = mCalendar.get(Calendar.HOUR_OF_DAY);
                 updateTime(h);
+                updateDate();
                 updateWeather();
             }
             else {
@@ -180,6 +182,10 @@ public class ClockWidget extends AppWidgetProvider {
 
         private void updateTime(int hour) {
             updater.updateTime(this.getApplicationContext(), hour);
+        }
+
+        private void updateDate() {
+            updater.updateDate(this.getApplicationContext());
         }
 
         private void updateWeather() {
@@ -235,8 +241,14 @@ public class ClockWidget extends AppWidgetProvider {
             //Toast.makeText(this, h + " " + d + " | " + updater.getCurHour() + " " + updater.getCurDay(), Toast.LENGTH_LONG).show();
             Log.v(TAG, "Time Status: " + h + " " + d + " | " + updater.getCurHour() + " " + updater.getCurDay());
             //Only update clock when my hour is different from the updater's hour
-            if (h != updater.getCurHour() || d != updater.getCurDay()) {
+            if (h != updater.getCurHour()) {
                 Log.v(TAG, "Updating Time");
+                updateTime(h);
+            }
+
+            if (d != updater.getCurDay()) {
+                Log.v(TAG, "Updating Date");
+                updateDate();
                 updateTime(h);
             }
 
